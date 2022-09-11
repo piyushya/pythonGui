@@ -3,6 +3,8 @@ from tkinter import Widget, ttk
 from ctypes import windll
 windll.shcore.SetProcessDpiAwareness(1)
 
+#learning
+
 def launch(event) :
     print("rocket lanuched")
 
