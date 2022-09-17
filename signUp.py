@@ -6,9 +6,10 @@ from tkinter.messagebox import showinfo
 from werkzeug.security import generate_password_hash, check_password_hash
 windll.shcore.SetProcessDpiAwareness(1)
 
-class signUp(tk.Tk) :
+class SignUp(tk.Tk) :
     def __init__(self) :
         super().__init__()
+        self.msg = ""
         self.title('User Interface 1.0')
         windowWidth = 600
         windowHeight = 400
@@ -21,10 +22,10 @@ class signUp(tk.Tk) :
         self.iconbitmap('assets/icon.ico')
 
         self.label = ttk.Label(
-            self, 
+            self,
             text="SignUp Window",
             background="white",
-            padding=10, 
+            padding=10,
             width=100,
             font=("Verdana", 14),
             foreground="black"
@@ -55,16 +56,21 @@ class signUp(tk.Tk) :
             text="Password :",
             font=("Georgia", 12)
         )
+        login_label = ttk.Label(
+            self,
+            text="Already Signed Up?",
+            foreground="blue"
+        )
 
-        email_entry = ttk.Entry(
+        self.email_entry = ttk.Entry(
             email_fr, 
             textvariable=self.email
         )
-        user_entry = ttk.Entry(
+        self.user_entry = ttk.Entry(
             username_fr, 
             textvariable=self.username
         )
-        password_entry = ttk.Entry(
+        self.password_entry = ttk.Entry(
             password_fr, 
             textvariable=self.password, 
             show="*"
@@ -73,21 +79,37 @@ class signUp(tk.Tk) :
         email_fr.pack(expand=True)
         username_fr.pack(expand=True)
         password_fr.pack(expand=True)
-
         
         email_label.pack(side=tk.LEFT, expand=True)
         user_label.pack(expand=True, side=tk.LEFT)
         password_label.pack(expand=True, side=tk.LEFT)
         
-        email_entry.pack(expand=True, padx=20)
-        user_entry.pack(expand=True, padx=20)
-        password_entry.pack(expand=True, padx=20)
+        self.email_entry.pack(expand=True, padx=20)
+        self.user_entry.pack(expand=True, padx=20)
+        self.password_entry.pack(expand=True, padx=20)
 
-        email_entry.focus()
+        self.email_entry.focus()
         # login button
-        login_button = ttk.Button(self, text="Signup", command=self.signup_clicked, padding=5)
+        login_button = ttk.Button(
+            self,
+            text="Signup",
+            command=self.signup_clicked,
+            padding=5
+        )
         login_button.pack(pady=30)
+        login_label.pack(expand=True)
+        login_label.bind("<Button>", self.login_link)
     
+    def login_link(self, event) :
+        self.destroy()
+        loginWindow = Login()
+        loginWindow.mainloop()
+
+    def resetFields(self):
+        self.user_entry.delete(0, 'end')
+        self.email_entry.delete(0, 'end')
+        self.password_entry.delete(0, 'end')
+
     def signup_clicked(self):
             #callback when the login button clicked
             if (not self.username.get()) or (not self.email.get()) or (not self.password.get()) :
@@ -96,21 +118,27 @@ class signUp(tk.Tk) :
                     message="Empty field"
                 )
                 return
-            self.dbOps()
-            msg = f"Login Successfull for user : {self.username.get()}"
+            self.dbOps() #execute database operations
             showinfo(
                 title='Information',
-                message=msg
+                message=self.msg
             )
+            self.resetFields()
+
     def dbOps(self):
         # database opeartion start
+        db = database.connect("data.db")
+        hash = generate_password_hash(self.password.get(), "sha256")
         try :
-            conn = database.connect("data.db")
-            curr = conn.cursor()
+            qry="INSERT INTO user (username, email, hash) VALUES (?,?,?);"
+            cur=db.cursor()
+            cur.execute(qry, (self.username.get(), self.email.get(), hash))
+            db.commit()
+            self.msg = f"SignUp Successfull for user : {self.username.get()}"
         except :
-            print("Error in database")
-        conn.close()
+            db.rollback()
+            self.msg = "Email or/and username is already taken try logging in instead"
+        db.close()
         #database operation end
 
-window = signUp()
-window.mainloop()
+from login import Login
