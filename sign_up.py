@@ -1,9 +1,9 @@
 import tkinter as tk
 import sqlite3 as database
-from tkinter import Widget, ttk
-from ctypes import windll
+from tkinter import ttk
 from tkinter.messagebox import showinfo
-from werkzeug.security import generate_password_hash, check_password_hash
+from ctypes import windll
+from werkzeug.security import generate_password_hash
 windll.shcore.SetProcessDpiAwareness(1)
 
 class SignUp(tk.Tk) :
@@ -42,8 +42,8 @@ class SignUp(tk.Tk) :
         password_fr = ttk.Frame(self)
 
         email_label = ttk.Label(
-            email_fr, 
-            text="Email :", 
+            email_fr,
+            text="Email :",
             font=("Georgia", 12)
         )
         user_label = ttk.Label(
@@ -63,27 +63,27 @@ class SignUp(tk.Tk) :
         )
 
         self.email_entry = ttk.Entry(
-            email_fr, 
+            email_fr,
             textvariable=self.email
         )
         self.user_entry = ttk.Entry(
-            username_fr, 
+            username_fr,
             textvariable=self.username
         )
         self.password_entry = ttk.Entry(
-            password_fr, 
-            textvariable=self.password, 
+            password_fr,
+            textvariable=self.password,
             show="*"
         )
 
         email_fr.pack(expand=True)
         username_fr.pack(expand=True)
         password_fr.pack(expand=True)
-        
+
         email_label.pack(side=tk.LEFT, expand=True)
         user_label.pack(expand=True, side=tk.LEFT)
         password_label.pack(expand=True, side=tk.LEFT)
-        
+
         self.email_entry.pack(expand=True, padx=20)
         self.user_entry.pack(expand=True, padx=20)
         self.password_entry.pack(expand=True, padx=20)
@@ -99,7 +99,7 @@ class SignUp(tk.Tk) :
         login_button.pack(pady=30)
         login_label.pack(expand=True)
         login_label.bind("<Button>", self.login_link)
-    
+
     def login_link(self, event) :
         self.destroy()
         loginWindow = Login()
@@ -112,7 +112,7 @@ class SignUp(tk.Tk) :
 
     def signup_clicked(self):
             #callback when the login button clicked
-            if (not self.username.get()) or (not self.email.get()) or (not self.password.get()) :
+            if not self.username.get() or not self.email.get() or not self.password.get() :
                 showinfo(
                     title='error',
                     message="Empty field"

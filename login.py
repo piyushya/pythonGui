@@ -132,4 +132,4 @@ class Login(tk.Tk) :
         db.close()
         return
 
-from signUp import SignUp
+from sign_up import SignUp
